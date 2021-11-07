@@ -8,3 +8,12 @@
 		int-gpios = <&gpiob 0 0>;
 	};
 };
+
+&usart1 {
+	current-speed = <57600>;
+	sim800l {
+		compatible = "simcom,sim800l";
+		label = "SIM800L";
+		mdm-reset-gpios = <&gpiob 1 0>;
+	};
+};

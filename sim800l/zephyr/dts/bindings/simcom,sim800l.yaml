@@ -1,0 +1,17 @@
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+description: SIM800L Modem
+
+compatible: "simcom,sim800l"
+
+include: uart-device.yaml
+
+properties:
+    label:
+      required: true
+
+    mdm-reset-gpios:
+        type: phandle-array
+        required: true

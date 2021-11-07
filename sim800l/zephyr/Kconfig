@@ -1,0 +1,21 @@
+# SIM800L modem driver options
+
+# SPDX-License-Identifier: Apache-2.0
+
+menuconfig MODEM_SIM800L
+	bool "Enable SIM800L modem driver"
+	select MODEM_RECEIVER
+	imply GPIO
+	help
+	  Choose this setting to enable
+	  SIM800L modem driver.
+
+if MODEM_SIM800L
+
+config MODEM_SIM800L_RX_STACK_SIZE
+	int "Size of the stack for the SIM800L modem driver RX thread"
+	default 1024
+	help
+	  This stack is used by the SIM800L RX thread.
+
+endif # MODEM_SIM800L
