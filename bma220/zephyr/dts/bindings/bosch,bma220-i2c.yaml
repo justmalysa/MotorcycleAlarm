@@ -1,0 +1,15 @@
+# SPDX-License-Identifier: Apache-2.0
+
+description: |
+  Bosch BMA220 triaxial acceleration sensor.
+
+compatible: "bosch,bma220"
+
+include: i2c-device.yaml
+
+properties:
+  int-gpios:
+    type: phandle-array
+    required: false
+    description: |
+      Identifies pin for the INT signal on the sensor.

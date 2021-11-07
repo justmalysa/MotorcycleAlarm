@@ -1,0 +1,98 @@
+# BMA220 Three Axis Accelerometer configuration options
+
+# SPDX-License-Identifier: Apache-2.0
+
+menuconfig BMA220
+	bool "BMA220 Three Axis Accelerometer Family"
+	depends on I2C
+	help
+	  Enable driver for BMA220 I2C-based triaxial accelerometer sensor
+	  family.
+
+if BMA220
+
+choice
+	prompt "Trigger mode"
+	default BMA220_TRIGGER_GLOBAL_THREAD
+	help
+	  Specify the type of triggering to be used by the driver.
+
+config BMA220_TRIGGER_NONE
+	bool "No trigger"
+
+config BMA220_TRIGGER_GLOBAL_THREAD
+	bool "Use global thread"
+	depends on GPIO
+	select BMA220_TRIGGER
+
+config BMA220_TRIGGER_OWN_THREAD
+	bool "Use own thread"
+	depends on GPIO
+	select BMA220_TRIGGER
+
+endchoice
+
+config BMA220_TRIGGER
+	bool
+
+config BMA220_THREAD_PRIORITY
+	int "Thread priority"
+	depends on BMA220_TRIGGER_OWN_THREAD
+	default 10
+	help
+	  Priority of thread used by the driver to handle interrupts.
+
+config BMA220_THREAD_STACK_SIZE
+	int "Thread stack size"
+	depends on BMA220_TRIGGER_OWN_THREAD
+	default 1024
+	help
+	  Stack size of thread used by the driver to handle interrupts.
+
+choice
+	prompt "Acceleration measurement range"
+	default BMA220_RANGE_2G
+	help
+	  Measurement range for acceleration values.
+
+config BMA220_RANGE_2G
+	bool "+/-2g"
+
+config BMA220_RANGE_4G
+	bool "+/-4g"
+
+config BMA220_RANGE_8G
+	bool "+/-8g"
+
+config BMA220_RANGE_16G
+	bool "+/-16g"
+
+endchoice
+
+choice
+	prompt "Acceleration data filter bandwidth"
+	default BMA220_BW_6
+	help
+	  Bandwidth of filtered acceleration data.
+
+config BMA220_BW_1
+	bool "32Hz"
+
+config BMA220_BW_2
+	bool "64HZ"
+
+config BMA220_BW_3
+	bool "125Hz"
+
+config BMA220_BW_4
+	bool "250Hz"
+
+config BMA220_BW_5
+	bool "500Hz"
+
+config BMA220_BW_6
+	bool "1000HZ"
+
+endchoice
+
+endif # BMA220
