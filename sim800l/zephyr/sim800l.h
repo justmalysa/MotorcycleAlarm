@@ -19,6 +19,8 @@ int sim800l_init(void);
 int sim800l_start_outgoing_call(const char *number);
 void sim800l_abort_outgoing_call(void);
 void sim800l_check_connection(void);
+void sim800l_check_if_call_is_ongoing(void);
+bool sim800l_ongoing_call(void);
 
 #ifdef __cplusplus
 }

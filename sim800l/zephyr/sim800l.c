@@ -30,6 +30,7 @@ LOG_MODULE_REGISTER(modem_sim800l, CONFIG_MODEM_LOG_LEVEL);
 #define AT_CMD_AT               "AT"
 #define AT_CMD_ATH              "ATH"
 #define AT_CMD_CREG             "AT+CREG?"
+#define AT_CMD_CPAS             "AT+CPAS"
 
 #define MDM_UART_DEV            DEVICE_DT_GET(DT_INST_BUS(0))
 
@@ -38,6 +39,7 @@ static uint8_t mdm_recv_buf[MDM_MAX_DATA_LENGTH];
 static char string_buf[INPUT_MAX_DATA_LENGTH];
 static size_t string_index;
 static volatile bool connection_established;
+static volatile bool call_ongoing;
 
 K_SEM_DEFINE(resp_ready, 0, 1);
 
@@ -57,6 +59,14 @@ static void sim800l_input_parse(const char *buf)
     else if ( 0 == strcmp(buf, "+CREG: 0,1"))
     {
         connection_established = true;
+    }
+    else if ((0 == strcmp(buf, "+CPAS: 3")) || (0 == strcmp(buf, "+CPAS: 4")))
+    {
+        call_ongoing = true;
+    }
+    else if (0 == strcmp(buf, "+CPAS: 0"))
+    {
+        call_ongoing = false;
     }
 }
 
@@ -178,4 +188,14 @@ void sim800l_check_connection(void)
         k_sleep(K_MSEC(1000));
     }
     connection_established = false;
+}
+
+void sim800l_check_if_call_is_ongoing(void)
+{
+    sim800l_send_at_cmd(AT_CMD_CPAS, sizeof(AT_CMD_CPAS) - 1);
+}
+
+bool sim800l_ongoing_call(void)
+{
+    return call_ongoing;
 }

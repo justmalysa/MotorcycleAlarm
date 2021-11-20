@@ -7,21 +7,26 @@
 
 #define DETECTED_MOTIONS_LIMIT    20
 
-struct k_timer timer;
+struct k_timer timer_detection;
+struct k_timer timer_call;
 static uint8_t detected_motions_cnt;
 static const char *p_user_number;
 
-static void expiry_function(struct k_timer *timer_id)
+static void detection_timer_expiry(struct k_timer *timer_id)
 {
     detected_motions_cnt = 0;
+}
+
+static void call_timer_expiry(struct k_timer *timer_id)
+{
+    sim800l_abort_outgoing_call();
 }
 
 static void call_user(void)
 {
     sim800l_check_connection();
     sim800l_start_outgoing_call(p_user_number);
-    k_sleep(K_MSEC(20000));
-    sim800l_abort_outgoing_call();
+    k_timer_start(&timer_call, K_SECONDS(20), K_FOREVER);
 }
 
 /*
@@ -55,7 +60,7 @@ static void motorcycle_alarm_any_motion_handler(const struct device *dev, struct
 {
     if (!detected_motions_cnt)
     {
-        k_timer_start(&timer, K_SECONDS(5), K_FOREVER);
+        k_timer_start(&timer_detection, K_SECONDS(5), K_FOREVER);
     }
 
     if (detected_motions_cnt < DETECTED_MOTIONS_LIMIT)
@@ -64,15 +69,17 @@ static void motorcycle_alarm_any_motion_handler(const struct device *dev, struct
     }
     else if (detected_motions_cnt == DETECTED_MOTIONS_LIMIT)
     {
-        call_user();
+        sim800l_check_if_call_is_ongoing();
+        if (!sim800l_ongoing_call())
+        {
+            call_user();
+        }
     }
     printk("CNT:%d \n", detected_motions_cnt);
 }
 
 static void bma220_init(void)
 {
-    k_timer_init(&timer, expiry_function, NULL);
-
     const struct device *dev = get_bma220_device();
 
     if (dev == NULL)
@@ -120,6 +127,9 @@ void motorcycle_alarm_init(const char *user_number)
     }
 
     bma220_init();
+
+    k_timer_init(&timer_detection, detection_timer_expiry, NULL);
+    k_timer_init(&timer_call, call_timer_expiry, NULL);
 
     p_user_number = user_number;
 }
