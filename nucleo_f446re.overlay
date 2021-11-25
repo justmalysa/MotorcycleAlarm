@@ -17,3 +17,15 @@
 		mdm-reset-gpios = <&gpiob 1 0>;
 	};
 };
+
+&usart3 {
+	status = "okay";
+	current-speed = <9600>;
+	pinctrl-0 = <&usart3_tx_pc10 &usart3_rx_pc11>;
+};
+
+/ {
+     aliases {
+             hc05-serial = &usart3;
+     };
+};
