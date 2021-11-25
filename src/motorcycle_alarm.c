@@ -53,19 +53,19 @@ static const struct device *get_bma220_device(void)
     if (dev == NULL)
     {
         /* No such node, or the node does not have status "okay". */
-        printk("\nError: no device found.\n");
+        LOG_ERR("\nError: no device found.\n");
         return NULL;
     }
 
     if (!device_is_ready(dev))
     {
-        printk("\nError: Device \"%s\" is not ready; "
+        LOG_ERR("\nError: Device \"%s\" is not ready; "
                "check the driver initialization logs for errors.\n",
                dev->name);
         return NULL;
     }
 
-    printk("Found device \"%s\", getting sensor data\n", dev->name);
+    LOG_INF("Found device \"%s\", getting sensor data\n", dev->name);
     return dev;
 }
 
@@ -88,7 +88,7 @@ static void any_motion_handler(const struct device *dev, struct sensor_trigger *
             call_user();
         }
     }
-    printk("CNT:%d \n", detected_motions_cnt);
+    LOG_INF("CNT:%d \n", detected_motions_cnt);
 }
 
 static void set_alarm_state(bool enable)
@@ -102,7 +102,7 @@ static void set_alarm_state(bool enable)
     int rc = sensor_trigger_set(dev, &trig, enable ? any_motion_handler : NULL);
     if (rc < 0)
     {
-        printk("\nError: trigger could not be set.\n");
+        LOG_ERR("\nError: trigger could not be set.\n");
         return;
     }
 }
@@ -131,7 +131,7 @@ static void bma220_init(void)
     int rc = sensor_attr_set(dev, SENSOR_CHAN_ACCEL_XYZ, SENSOR_ATTR_SLOPE_TH, &val);
     if (rc < 0)
     {
-        printk("\nError: threshold could not be configured.\n");
+        LOG_ERR("\nError: threshold could not be configured.\n");
         return;
     }
 
@@ -140,7 +140,7 @@ static void bma220_init(void)
     rc = sensor_attr_set(dev, SENSOR_CHAN_ACCEL_XYZ, SENSOR_ATTR_SLOPE_DUR, &val);
     if (rc < 0)
     {
-        printk("\nError: duration could not be configured.\n");
+        LOG_ERR("\nError: duration could not be configured.\n");
         return;
     }
 
@@ -202,7 +202,7 @@ static void hc05_init(void)
     if (dev == NULL)
     {
         /* No such node, or the node does not have status "okay". */
-        printk("\nError: no device found.\n");
+        LOG_ERR("\nError: no device found.\n");
         return;
     }
 
@@ -220,7 +220,7 @@ void motorcycle_alarm_init(const char *user_number)
 {
     if (sim800l_init() < 0)
     {
-        printk("\nError: failed to init SIM800L modem.\n");
+        LOG_ERR("\nError: failed to init SIM800L modem.\n");
     }
 
     bma220_init();
