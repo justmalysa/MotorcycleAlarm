@@ -1,9 +1,9 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 
 &i2c2 {
-	bma220@0a {
+	bma220@a {
 		compatible = "bosch,bma220";
-		reg = <0x0a>;
+		reg = <0xa>;
 		label = "BMA220_I2C";
 		int-gpios = <&gpiob 0 0>;
 	};
