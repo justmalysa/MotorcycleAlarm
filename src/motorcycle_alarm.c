@@ -65,7 +65,6 @@ static const struct device *get_bma220_device(void)
         return NULL;
     }
 
-    LOG_INF("Found device \"%s\", getting sensor data\n", dev->name);
     return dev;
 }
 
@@ -88,7 +87,7 @@ static void any_motion_handler(const struct device *dev, struct sensor_trigger *
             call_user();
         }
     }
-    LOG_INF("CNT:%d \n", detected_motions_cnt);
+    LOG_INF("Detection count: %d", detected_motions_cnt);
 }
 
 static void set_alarm_state(bool enable)
@@ -110,7 +109,6 @@ static void set_alarm_state(bool enable)
 static void set_alarm_state_workqueue(struct k_work *item)
 {
     struct alarm_work_item *work = CONTAINER_OF(item, struct alarm_work_item, work);
-    LOG_INF("Set alarm state invoked from workqueue. Param: %u", work->enable);
     set_alarm_state(work->enable);
 }
 
@@ -144,7 +142,7 @@ static void bma220_init(void)
         return;
     }
 
-    set_alarm_state(true);
+    set_alarm_state(false);
 }
 
 static void hc05_rx_isr(const struct device *dev, void *user_data)
@@ -157,7 +155,6 @@ static void hc05_rx_isr(const struct device *dev, void *user_data)
         uint8_t c;
         if (uart_fifo_read(dev, &c, 1) > 0 )
         {
-            LOG_INF("Received char: >0x%x<", c);
             if (index >= HC05_BUFFER_SIZE)
             {
                 index = 0;
