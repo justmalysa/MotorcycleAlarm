@@ -68,6 +68,46 @@ static const struct device *get_bma220_device(void)
     return dev;
 }
 
+void bma220_measure(void)
+{
+    const struct device *dev = get_bma220_device();
+
+    if (dev == NULL)
+    {
+        return;
+    }
+
+    struct sensor_value accel[3];
+
+    if (sensor_sample_fetch(dev) < 0)
+    {
+        LOG_DBG("Error when fetching the data\n");
+    }
+
+    if (sensor_channel_get(dev, SENSOR_CHAN_ACCEL_X, &accel[0]) < 0)
+    {
+        LOG_DBG("Channel X get error\n");
+        return;
+    }
+
+    if (sensor_channel_get(dev, SENSOR_CHAN_ACCEL_Y, &accel[1]) < 0)
+    {
+        LOG_DBG("Channel Y get error\n");
+        return;
+    }
+
+    if (sensor_channel_get(dev, SENSOR_CHAN_ACCEL_Z, &accel[2]) < 0)
+    {
+        LOG_DBG("Channel Z get error\n");
+        return;
+    }
+
+    LOG_INF("%d.%d,%d.%d,%d.%d,",
+            accel[0].val1, accel[0].val2,
+            accel[1].val1, accel[1].val2,
+            accel[2].val1, accel[2].val2);
+}
+
 static void any_motion_handler(const struct device *dev, struct sensor_trigger *trigger)
 {
     if (!detected_motions_cnt)
@@ -123,8 +163,8 @@ static void bma220_init(void)
 
     struct sensor_value val =
     {
-        .val1 = SENSOR_G / 1000000,
-        .val2 = SENSOR_G % 1000000,
+        .val1 = (SENSOR_G/8) / 1000000,
+        .val2 = (SENSOR_G/8) % 1000000,
     };
     int rc = sensor_attr_set(dev, SENSOR_CHAN_ACCEL_XYZ, SENSOR_ATTR_SLOPE_TH, &val);
     if (rc < 0)

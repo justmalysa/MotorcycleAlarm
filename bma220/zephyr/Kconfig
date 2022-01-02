@@ -71,7 +71,7 @@ endchoice
 
 choice
 	prompt "Acceleration data filter bandwidth"
-	default BMA220_BW_6
+	default BMA220_BW_4
 	help
 	  Bandwidth of filtered acceleration data.
 

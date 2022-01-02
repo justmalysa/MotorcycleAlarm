@@ -18,6 +18,10 @@
 	};
 };
 
+&usart2 {
+	current-speed = <921600>;
+};
+
 &usart3 {
 	status = "okay";
 	current-speed = <9600>;
